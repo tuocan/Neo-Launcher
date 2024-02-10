@@ -55,7 +55,7 @@ class SystemIconPack(context: Context) : IconPack(context, "") {
         return app.getIcon(iconDpi)
     }
 
-    override fun getIcon(shortcutInfo: ShortcutInfo, iconDpi: Int): Drawable? {
+    fun getIcon(shortcutInfo: ShortcutInfo, iconDpi: Int): Drawable? {
         val key = ComponentKey.fromString(shortcutInfo.`package`)
         val app = appMap[key] ?: return null
         return app.getIcon(iconDpi)
