@@ -30,7 +30,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -42,7 +41,6 @@ import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PictureDrawable;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -56,10 +54,12 @@ import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 
 import com.android.app.animation.Interpolators;
+import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.icons.FastBitmapDrawable;
 import com.android.launcher3.icons.LauncherIcons;
+import com.android.launcher3.model.data.FolderInfo;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.util.RunnableList;
 import com.android.launcher3.views.ActivityContext;
@@ -240,8 +240,15 @@ public abstract class DragView<T extends Context & ActivityContext> extends Fram
      * Initialize {@code #mIconDrawable} if the item can be represented using
      * an {@link AdaptiveIconDrawable} or {@link FolderAdaptiveIcon}.
      */
-    @TargetApi(Build.VERSION_CODES.O)
     public void setItemInfo(final ItemInfo info) {
+        if (info.itemType != LauncherSettings.Favorites.ITEM_TYPE_APPLICATION
+                && info.itemType != LauncherSettings.Favorites.ITEM_TYPE_DEEP_SHORTCUT
+                && info.itemType != LauncherSettings.Favorites.ITEM_TYPE_FOLDER) {
+            return;
+        }
+        if (info instanceof FolderInfo && ((FolderInfo) info).usingCustomIcon(mActivity)) {
+            return;
+        }
         // Load the adaptive icon on a background thread and add the view in ui thread.
         MODEL_EXECUTOR.getHandler().postAtFrontOfQueue(() -> {
             Object[] outObj = new Object[1];
